@@ -5,27 +5,33 @@ const crypto = require("crypto");
 // Register new user
 const register = async (req, res) => {
   try {
+    console.log("Registration attempt:", req.body);
+
     const { username, email, password, firstName, lastName } = req.body;
 
-    // Validation
+    // Basic validation
     if (!username || !email || !password) {
+      console.log("Missing required fields");
       return res.status(400).json({
         error: "Username, email, and password are required"
       });
     }
 
     if (password.length < 6) {
+      console.log("Password too short");
       return res.status(400).json({
         error: "Password must be at least 6 characters long"
       });
     }
 
     // Check if user already exists
+    console.log("Checking for existing user...");
     const existingUser = await User.findOne({
       $or: [{ email }, { username }]
     });
 
     if (existingUser) {
+      console.log("User already exists");
       if (existingUser.email === email) {
         return res.status(400).json({
           error: "Email already registered"
@@ -38,16 +44,18 @@ const register = async (req, res) => {
     }
 
     // Create new user
+    console.log("Creating new user...");
     const user = new User({
       username: username.trim(),
       email: email.toLowerCase().trim(),
       password,
-      firstName: firstName?.trim(),
-      lastName: lastName?.trim(),
-      emailVerificationToken: crypto.randomBytes(32).toString('hex')
+      firstName: firstName?.trim() || "",
+      lastName: lastName?.trim() || ""
     });
 
+    console.log("Saving user to database...");
     await user.save();
+    console.log("User saved successfully");
 
     // Generate JWT token
     const token = generateToken(user._id);
@@ -56,6 +64,7 @@ const register = async (req, res) => {
     user.lastLoginAt = new Date();
     await user.save();
 
+    console.log("Registration successful for:", username);
     res.status(201).json({
       message: "User registered successfully",
       token,
@@ -67,14 +76,13 @@ const register = async (req, res) => {
         lastName: user.lastName,
         fullName: user.fullName,
         avatar: user.avatar,
-        status: user.status,
-        isEmailVerified: user.isEmailVerified
+        status: user.status
       }
     });
 
   } catch (error) {
     console.error("Registration error:", error);
-    
+
     if (error.code === 11000) {
       // Duplicate key error
       const field = Object.keys(error.keyPattern)[0];
@@ -99,10 +107,13 @@ const register = async (req, res) => {
 // Login user
 const login = async (req, res) => {
   try {
+    console.log("Login attempt:", req.body);
+
     const { identifier, password } = req.body; // identifier can be email or username
 
     // Validation
     if (!identifier || !password) {
+      console.log("Missing login credentials");
       return res.status(400).json({
         error: "Email/username and password are required"
       });

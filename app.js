@@ -43,6 +43,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files (for uploaded files)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve the main HTML file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve test page
+app.get('/test', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test.html'));
+});
+
 // Basic security headers
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -106,8 +116,9 @@ connectDB();
 handleSocketConnection(io);
 
 // Start server
-
-const port = process.env.PORT || 1235;
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-}); 
+const PORT = process.env.PORT || 1235;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
+});
