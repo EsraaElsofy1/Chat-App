@@ -118,7 +118,7 @@ handleSocketConnection(io);
 // Start server
 const PORT = process.env.PORT || 1235;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
+  console.log(` Server running on http://localhost:${PORT}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(` CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:3000'}`);
 });
